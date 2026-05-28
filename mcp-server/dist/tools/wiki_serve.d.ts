@@ -1,8 +1,8 @@
 import type { BridgeOptions } from "../bridge.js";
-import type { RunFn } from "./wiki_query.js";
 export interface WikiServeInput {
     workspace: string;
     no_auth?: boolean;
+    port?: number;
 }
 export declare const wikiServeTool: {
     name: string;
@@ -18,11 +18,15 @@ export declare const wikiServeTool: {
                 type: string;
                 description: string;
             };
+            port: {
+                type: string;
+                description: string;
+            };
         };
         required: string[];
     };
 };
-export declare function handleWikiServe(opts: BridgeOptions, input: WikiServeInput, run: RunFn): Promise<{
+export declare function handleWikiServe(opts: BridgeOptions, input: WikiServeInput): Promise<{
     content: {
         type: "text";
         text: string;

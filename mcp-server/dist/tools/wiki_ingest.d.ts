@@ -3,6 +3,7 @@ import type { RunFn } from "./wiki_query.js";
 export interface WikiIngestInput {
     workspace: string;
     pages: string;
+    log?: string;
     project?: string;
 }
 export declare const wikiIngestTool: {
@@ -16,6 +17,10 @@ export declare const wikiIngestTool: {
                 description: string;
             };
             pages: {
+                type: string;
+                description: string;
+            };
+            log: {
                 type: string;
                 description: string;
             };

@@ -5,6 +5,7 @@ import type { RunFn } from "./wiki_query.js";
 export interface WikiIngestInput {
   workspace: string;
   pages: string;
+  log?: string;
   project?: string;
 }
 
@@ -17,6 +18,7 @@ export const wikiIngestTool = {
     properties: {
       workspace: { type: "string", description: "Path assoluto al wiki workspace" },
       pages: { type: "string", description: "Path al file .tmp con le pagine da ingestare" },
+      log: { type: "string", description: "Etichetta per il log dell'operazione (default: 'ingest | via-mcp')" },
       project: { type: "string", description: "Nome del progetto wiki-works (opzionale)" },
     },
     required: ["workspace", "pages"],
@@ -29,7 +31,12 @@ export async function handleWikiIngest(
   run: RunFn
 ) {
   const scriptPath = join(opts.scriptsDir, "wiki.py");
-  const args = ["ingest", "--workspace", input.workspace, "--pages", input.pages];
+  const args = [
+    "ingest",
+    "--workspace", input.workspace,
+    "--pages", input.pages,
+    "--log", input.log ?? "ingest | via-mcp",
+  ];
   if (input.project) args.push("--project", input.project);
   const output = await run(opts, scriptPath, args);
   return {

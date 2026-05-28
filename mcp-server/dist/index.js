@@ -40,7 +40,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             case "wiki_lint":
                 return await handleWikiLint(opts, { workspace: String(i.workspace ?? opts.workspace), project: i.project }, runScript);
             case "wiki_serve":
-                return await handleWikiServe(opts, { workspace: String(i.workspace ?? opts.workspace), no_auth: Boolean(i.no_auth) }, runScript);
+                return await handleWikiServe(opts, { workspace: String(i.workspace ?? opts.workspace), no_auth: Boolean(i.no_auth), port: i.port });
             default:
                 return { content: [{ type: "text", text: `Tool sconosciuto: ${name}` }], isError: true };
         }

@@ -92,8 +92,9 @@ function writeSettings(path: string, settings: ClaudeSettings): void {
 }
 
 // ── CLI — eseguito solo quando invocato direttamente ──────────────────────────
+// Usa import.meta.url per compatibilità con npx e percorsi assoluti/relativi
 const isMain = process.argv[1] !== undefined &&
-  (process.argv[1].endsWith("install.ts") || process.argv[1].endsWith("install.js"));
+  fileURLToPath(import.meta.url) === resolve(process.argv[1]);
 
 if (isMain) {
   const __dirname_main = dirname(fileURLToPath(import.meta.url));

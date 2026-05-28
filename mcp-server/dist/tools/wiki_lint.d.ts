@@ -2,6 +2,7 @@ import type { BridgeOptions } from "../bridge.js";
 import type { RunFn } from "./wiki_query.js";
 export interface WikiLintInput {
     workspace: string;
+    full?: boolean;
     project?: string;
 }
 export declare const wikiLintTool: {
@@ -11,6 +12,10 @@ export declare const wikiLintTool: {
         type: "object";
         properties: {
             workspace: {
+                type: string;
+                description: string;
+            };
+            full: {
                 type: string;
                 description: string;
             };

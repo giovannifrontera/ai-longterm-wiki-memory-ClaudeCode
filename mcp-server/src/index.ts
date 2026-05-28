@@ -69,8 +69,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case "wiki_serve":
         return await handleWikiServe(
           opts,
-          { workspace: String(i.workspace ?? opts.workspace), no_auth: Boolean(i.no_auth) },
-          runScript
+          { workspace: String(i.workspace ?? opts.workspace), no_auth: Boolean(i.no_auth), port: i.port as number | undefined }
         );
       default:
         return { content: [{ type: "text" as const, text: `Tool sconosciuto: ${name}` }], isError: true };

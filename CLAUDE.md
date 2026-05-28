@@ -13,17 +13,23 @@ Se l'utente ti chiede di installare il wiki system, segui questi passi nell'ordi
 ### Step 1 — Verifica prerequisiti
 
 ```bash
-python --version        # deve essere 3.10+
 node --version          # deve essere 20+
-python -c "import lancedb; print('lancedb ok')"
 ```
 
-Se lancedb non è installato:
+Per Python, prova in ordine finché uno funziona:
 ```bash
-pip install lancedb sentence-transformers
+py -c "import lancedb; print('lancedb ok')"       # Windows
+python -c "import lancedb; print('lancedb ok')"   # Linux/macOS
+python3 -c "import lancedb; print('lancedb ok')"  # Linux/macOS alternativo
 ```
 
-Non procedere finché `import lancedb` non funziona.
+Se lancedb non è installato, usa lo stesso eseguibile che funziona:
+```bash
+py -m pip install lancedb sentence-transformers       # Windows
+python -m pip install lancedb sentence-transformers   # Linux/macOS
+```
+
+Non procedere finché `import lancedb` non stampa `lancedb ok`. Annota l'eseguibile che ha funzionato (`py`, `python`, o `python3`) — serve al Step 4.
 
 ---
 
@@ -60,16 +66,18 @@ Sostituisci `<WORKSPACE>` con il path assoluto reale. Mantieni tutte le altre ch
 
 ### Step 4 — Inizializza l'indice vettoriale
 
+Usa l'eseguibile Python trovato al Step 1 (`py`, `python`, o `python3`):
 ```bash
-python scripts/wiki.py rebuild --workspace <WORKSPACE>
+<PYTHON> scripts/wiki.py rebuild --workspace <WORKSPACE>
 ```
 
-Output atteso: `{"status": "ok", ...}`. Se fallisce, controlla che lancedb sia installato nel Python corretto.
+Output atteso: `{"status": "ok", ...}`. Se fallisce, controlla che lancedb sia installato nel Python usato.
 
 ---
 
 ### Step 5 — Installa hook e MCP server
 
+Esegui dalla **root del repo clonato**:
 ```bash
 node installer/dist/install.js --workspace <WORKSPACE>
 ```
