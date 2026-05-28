@@ -73,3 +73,24 @@ describe("handleWikiLint", () => {
     expect(result.content[0].text).toBe("LINT OK: 0 issues");
   });
 });
+
+import { wikiServeTool, handleWikiServe } from "../src/tools/wiki_serve.js";
+
+describe("wikiServeTool definition", () => {
+  it("ha name corretto", () => expect(wikiServeTool.name).toBe("wiki_serve"));
+  it("richiede workspace", () => {
+    expect((wikiServeTool.inputSchema.required as string[])).toContain("workspace");
+  });
+});
+
+describe("handleWikiServe", () => {
+  it("ritorna istruzione di avvio", async () => {
+    const fakeRun = async () => "Dashboard available at http://localhost:7331";
+    const result = await handleWikiServe(
+      { workspace: "/wiki", scriptsDir: "/repo/scripts", python: "py" },
+      { workspace: "/wiki" },
+      fakeRun
+    );
+    expect(result.content[0].text).toContain("7331");
+  });
+});
