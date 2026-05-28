@@ -26,3 +26,28 @@ describe("handleWikiQuery", () => {
     expect(result.content[0].text).toContain("wiki-context");
   });
 });
+
+import { wikiIngestTool, handleWikiIngest } from "../src/tools/wiki_ingest.js";
+
+describe("wikiIngestTool definition", () => {
+  it("ha name corretto", () => {
+    expect(wikiIngestTool.name).toBe("wiki_ingest");
+  });
+  it("ha inputSchema con workspace e pages obbligatori", () => {
+    const required = wikiIngestTool.inputSchema.required as string[];
+    expect(required).toContain("workspace");
+    expect(required).toContain("pages");
+  });
+});
+
+describe("handleWikiIngest", () => {
+  it("ritorna content con output dello script", async () => {
+    const fakeRun = async () => '{"status":"ok","pages_written":1}';
+    const result = await handleWikiIngest(
+      { workspace: "/wiki", scriptsDir: "/repo/scripts", python: "py" },
+      { workspace: "/wiki", pages: "page.tmp" },
+      fakeRun
+    );
+    expect(result.content[0].text).toContain("ok");
+  });
+});
