@@ -1,0 +1,7 @@
+{
+  "lancedb": {
+    "path": "memory/lancedb",
+    "embedding_model": "BAAI/bge-m3"
+  },
+  "exclude_from_index": []
+}
