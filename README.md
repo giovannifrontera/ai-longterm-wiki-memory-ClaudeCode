@@ -304,54 +304,57 @@ A `[Stats]` tab built into the web server shows the health of the wiki at a glan
 
 ## Quick Start
 
-### Requirements
+### Recommended: let Claude install it for you
 
-- Python 3.10+ — ~2 GB disk for BAAI/bge-m3 (downloaded automatically on first run)
+The easiest way to install is to let Claude Code handle the setup automatically.
+
+1. Clone this repo and open it in Claude Code:
+   ```bash
+   git clone https://github.com/giovannifrontera/ai-longterm-wiki-memory-ClaudeCode
+   ```
+2. Open Claude Code in the cloned directory
+3. Say: **"install the wiki system"**
+
+Claude reads `CLAUDE.md` and walks you through the entire setup — checks prerequisites, asks where to store your wiki, configures everything, and activates the integration. No manual steps needed.
+
+---
+
+### Manual install (if you prefer)
+
+#### Requirements
+
+- Python 3.10+ — ~2 GB disk for BAAI/bge-m3 (downloaded on first run)
 - Node.js 20+
 - Claude Code CLI
+- lancedb: `pip install lancedb sentence-transformers`
 
-### Install
+#### Steps
 
 ```bash
+# 1. Clone
 git clone https://github.com/giovannifrontera/ai-longterm-wiki-memory-ClaudeCode
 cd ai-longterm-wiki-memory-ClaudeCode
+
+# 2. Python dependencies
 pip install -r requirements.txt
-cd mcp-server && npm install && npm run build && cd ..
-cd installer && npm install && npm run build && cd ..
+
+# 3. Configure — choose a directory for your wiki knowledge
+#    Option A: use this repo directory
+cp wiki.config.json.example wiki.config.json
+#    Option B: use a separate directory
+cp wiki.config.json.example /path/to/your/wiki/wiki.config.json
 ```
 
-### Configure
-
-```bash
-mkdir /path/to/your/workspace
-cp wiki.config.json.example /path/to/your/workspace/wiki.config.json
-```
-
-Edit `wiki.config.json` — set `workspace` to the absolute path, define your projects:
+Edit `wiki.config.json` and set `"workspace"` to the absolute path of your chosen directory. Minimal config:
 
 ```json
 {
-  "workspace": "/absolute/path/to/workspace",
-  "pdf_inbox": {
-    "project_default": "research"
-  },
+  "workspace": "/absolute/path/to/your/wiki",
   "projects": {
     "research": {
       "path": "wiki-works/research",
       "keywords": ["paper", "study", "article", "review"]
     }
-  },
-  "thresholds": {
-    "index_token_budget": 4000,
-    "staleness_days": 90,
-    "similarity_merge": 0.95,
-    "similarity_orphan": 0.50,
-    "synthesis_min_tokens": 300,
-    "synthesis_min_sources": 2,
-    "chunk_size_tokens": 512,
-    "chunk_overlap_tokens": 64,
-    "page_chunk_threshold_tokens": 1500,
-    "quality_filter_min_score": 6
   },
   "lancedb": {
     "path": "memory/lancedb",
@@ -360,17 +363,17 @@ Edit `wiki.config.json` — set `workspace` to the absolute path, define your pr
 }
 ```
 
-### Initialize and integrate
-
 ```bash
-# Initialize the vector index
-python scripts/wiki.py rebuild --workspace /path/to/workspace
+# 4. Initialize the vector index
+python scripts/wiki.py rebuild --workspace /absolute/path/to/your/wiki
 
-# Install hook + MCP server into Claude Code
-node installer/dist/install.js --workspace /path/to/workspace
+# 5. Install hook + MCP server into Claude Code
+node installer/dist/install.js --workspace /absolute/path/to/your/wiki
+
+# 6. Restart Claude Code
 ```
 
-Restart Claude Code. Done.
+> **Note:** `installer/dist/` is pre-built and included in the repo — no TypeScript compilation needed.
 
 ### Dependencies
 
