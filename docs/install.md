@@ -3,7 +3,7 @@
 ## Prerequisiti
 
 - Node.js 20+
-- Python con lancedb installato (`py -m pip install lancedb sentence-transformers` su Windows)
+- Python con lancedb installato (`pip install lancedb sentence-transformers`)
 - Claude Code CLI
 
 ## Build
@@ -19,7 +19,7 @@ cd ../installer && npm install && npm run build
 node installer/dist/install.js --workspace /path/assoluto/al/wiki
 ```
 
-Opzioni: `--k 3`, `--python py`, `--global`, `--dry-run`, `--uninstall`.
+Opzioni: `--k 3`, `--python <exe>` (auto-rilevato se omesso), `--global`, `--dry-run`, `--uninstall`.
 
 ## Verifica
 
