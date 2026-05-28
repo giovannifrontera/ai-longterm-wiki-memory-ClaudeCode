@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -22,6 +23,28 @@ interface McpEntry {
 interface ClaudeSettings {
   hooks?: { UserPromptSubmit?: HookEntry[] };
   mcpServers?: Record<string, McpEntry>;
+}
+
+// ── Python auto-detection ─────────────────────────────────────────────────────
+export function detectPython(): string {
+  const candidates = process.platform === "win32"
+    ? ["py", "python", "python3"]
+    : ["python3", "python"];
+
+  for (const candidate of candidates) {
+    try {
+      execFileSync(candidate, ["-c", "import lancedb"], {
+        encoding: "utf-8", timeout: 5000, stdio: "pipe",
+      });
+      return candidate;
+    } catch {
+      // try next
+    }
+  }
+
+  const fallback = process.platform === "win32" ? "py" : "python3";
+  console.warn(`⚠️  Nessun Python con lancedb trovato tra ${candidates.join(", ")}. Uso "${fallback}" come fallback. Installa lancedb: pip install lancedb`);
+  return fallback;
 }
 
 // ── Costruttori (esportati per i test) ────────────────────────────────────────
@@ -89,7 +112,7 @@ if (isMain) {
   const isDryRun = argv.includes("--dry-run");
   const isUninstall = argv.includes("--uninstall");
   const k = parseInt(getArg("--k", "3"), 10);
-  const python = getArg("--python", process.platform === "win32" ? "py" : "python3");
+  const python = argv.includes("--python") ? getArg("--python") : detectPython();
   const repoRoot = resolve(__dirname_main, "..", "..");
   const scriptsDir = join(repoRoot, "scripts");
   const serverDist = join(repoRoot, "mcp-server", "dist", "index.js");

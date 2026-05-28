@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildHookEntry, buildMcpEntry } from "../install.js";
+import { buildHookEntry, buildMcpEntry, detectPython } from "../install.js";
 
 describe("buildHookEntry", () => {
   it("produce un hook UserPromptSubmit valido", () => {
@@ -13,6 +13,14 @@ describe("buildHookEntry", () => {
     expect(entry.hooks[0].type).toBe("command");
     expect(entry.hooks[0].command).toContain("wiki_context.py");
     expect(entry.hooks[0].command).toContain("--workspace");
+  });
+});
+
+describe("detectPython", () => {
+  it("ritorna una stringa non vuota", () => {
+    const py = detectPython();
+    expect(typeof py).toBe("string");
+    expect(py.length).toBeGreaterThan(0);
   });
 });
 
