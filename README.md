@@ -2,151 +2,151 @@
 
 # AI Longterm Wiki Memory — Claude Code
 
-**Native MCP integration for Claude Code CLI**
+**Claude Code ricorda tutto tra una sessione e l'altra.**
 
-Long-term semantic memory for Claude Code — auto-injects relevant wiki pages before every prompt via `UserPromptSubmit` hook, and exposes wiki operations as native MCP tools.
+Ogni volta che scrivi un prompt, le pagine wiki più rilevanti vengono iniettate automaticamente nel contesto — senza che tu faccia nulla. Puoi anche chiedere a Claude di aggiungere, cercare o manutenere la tua base di conoscenza direttamente dalla chat.
 
-[![Version](https://img.shields.io/badge/version-0.1.0-informational)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.1.0-informational)](#)
 [![Tests](https://img.shields.io/badge/tests-16%20passed-brightgreen)](mcp-server/tests/)
-[![Node](https://img.shields.io/badge/node-20%2B-green)](https://nodejs.org/)
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
-[![Claude Code](https://img.shields.io/badge/works%20with-Claude%20Code-orange)](https://claude.ai/code)
-
-[Quick Start](#quick-start) · [Architecture](#architecture) · [MCP Tools](#mcp-tools) · [CLI Reference](#cli-reference)
-
----
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-orange)](https://claude.ai/code)
 
 </div>
 
-> **Looking for the OpenClaw plugin?** See [`ai-longterm-wiki-memory-OpenClaw`](https://github.com/giovannifrontera/ai-longterm-wiki-memory-OpenClaw).
+---
 
-## What it does
+## Il problema
 
-Every Claude Code prompt automatically receives a `<wiki-context>` block with the most semantically relevant pages from your personal wiki — **before** you even finish typing. When you need to actively manage the wiki, four MCP tools are available directly in the conversation.
+Claude Code dimentica tutto tra una sessione e l'altra. Ogni volta che riapri il terminale devi rispiegare il contesto, riesumare le decisioni prese, ricordare come funziona il progetto. Se stai lavorando su qualcosa di ricorrente — ricerca, codice, analisi — questo diventa un attrito costante.
+
+## La soluzione
+
+Un wiki personale che Claude legge **automaticamente** prima di risponderti. Tu scrivi le conoscenze che vuoi che ricordi; il sistema le recupera per similarità semantica e le mette nel contesto senza che tu le chieda.
 
 ```
-User types a prompt
-        │
-        ▼
-UserPromptSubmit hook → wiki_context.py → LanceDB top-k search
-        │
-        ▼
-<wiki-context> block prepended — Claude has your knowledge
+Scrivi un prompt
+       │
+       ▼
+wiki_context.py cerca le pagine più rilevanti nel tuo wiki
+       │
+       ▼
+Claude legge il contesto → risponde sapendo già quello che sa
 ```
 
-## Quick Start
+Dopo l'installazione non cambia nulla nel tuo modo di lavorare. Claude ha semplicemente più contesto.
 
-### Prerequisites
+---
 
+## Installazione
+
+### 1. Prerequisiti
+
+- [Claude Code CLI](https://claude.ai/code)
 - Node.js 20+
-- Python 3.10+ with lancedb (`pip install lancedb sentence-transformers`)
-- Claude Code CLI
-- A wiki workspace (see [ai-longterm-wiki-memory-OpenClaw](https://github.com/giovannifrontera/ai-longterm-wiki-memory-OpenClaw) to create one)
+- Python 3.10+ con lancedb:
+  ```bash
+  pip install lancedb sentence-transformers
+  ```
 
-### Build
-
-```bash
-cd mcp-server && npm install && npm run build
-cd ../installer && npm install && npm run build
-```
-
-### Install
+### 2. Clona il repo
 
 ```bash
-node installer/dist/install.js --workspace /absolute/path/to/your/wiki
+git clone https://github.com/giovannifrontera/ai-longterm-wiki-memory-ClaudeCode
+cd ai-longterm-wiki-memory-ClaudeCode
 ```
 
-The installer auto-detects the Python executable that can import `lancedb` — no manual path needed.
-
-Restart Claude Code. Done.
-
-### Verify
-
-Open Claude Code in any directory and type a prompt. You should see a `<wiki-context>` block in the injected context. Try asking Claude to use `wiki_query` to search for something in your wiki.
-
----
-
-## Architecture
-
-```
-ai-longterm-wiki-memory-ClaudeCode/
-├── mcp-server/          ← TypeScript MCP server
-│   ├── src/
-│   │   ├── index.ts     ← entry point: parses --workspace, wires 4 tools
-│   │   ├── bridge.ts    ← execFile wrapper: runs Python scripts async
-│   │   └── tools/
-│   │       ├── wiki_query.ts
-│   │       ├── wiki_ingest.ts
-│   │       ├── wiki_lint.ts
-│   │       └── wiki_serve.ts
-│   └── dist/            ← compiled output
-│
-├── installer/           ← CLI installer
-│   └── install.ts       ← auto-detects Python, writes hook + mcpServers
-│
-├── scripts/             ← Python backend (wiki.py, wiki_context.py, ...)
-└── wiki.config.json.example
-```
-
-**Two independent channels:**
-
-| Channel | Trigger | What it does |
-|---------|---------|--------------|
-| Hook (`UserPromptSubmit`) | Every prompt, automatically | Runs `wiki_context.py`, prepends `<wiki-context>` |
-| MCP tools | When Claude calls them | Runs `wiki.py` commands (ingest, lint, serve, query) |
-
-If the hook fails, MCP tools still work. If MCP is unavailable, the hook still injects context.
-
----
-
-## MCP Tools
-
-| Tool | Python script | Description |
-|------|--------------|-------------|
-| `wiki_query` | `wiki_context.py` | Search for relevant wiki pages by semantic query |
-| `wiki_ingest` | `wiki.py ingest` | Add structured knowledge pages to the wiki |
-| `wiki_lint` | `wiki.py lint` | Find and fix stale vectors, broken links, duplicates |
-| `wiki_serve` | `wiki.py serve` | Launch the wiki dashboard at `http://localhost:7331` |
-
-When `<wiki-context>` is already in the prompt context, use it directly — do not call `wiki_query` again for the same query.
-
----
-
-## Installer CLI Reference
+### 3. Build
 
 ```bash
-node installer/dist/install.js [options]
-
-Options:
-  --workspace <path>    Required. Absolute path to the wiki workspace.
-  --k <n>              Chunks to inject per prompt (default: 3).
-  --python <exe>       Python executable override (auto-detected if omitted).
-  --global             Install into ~/.claude/settings.json instead of local.
-  --dry-run            Preview settings.json output without writing.
-  --uninstall          Remove hook and mcpServers entry.
+cd mcp-server && npm install && npm run build && cd ..
+cd installer && npm install && npm run build && cd ..
 ```
 
-**Python auto-detection:** tries `py`, `python`, `python3` (Windows) or `python3`, `python` (Linux/macOS) in order, picks the first that can `import lancedb`.
+### 4. Prepara il workspace
 
----
-
-## Manual MCP registration (alternative to installer)
+Il workspace è una directory qualsiasi dove verranno salvate le tue pagine wiki. Copia il file di configurazione di esempio:
 
 ```bash
-claude mcp add wiki-context -- node /absolute/path/to/mcp-server/dist/index.js --workspace /absolute/path/to/wiki
+cp wiki.config.json.example /percorso/al/tuo/workspace/wiki.config.json
+```
+
+Apri `wiki.config.json` e imposta `"workspace"` con il percorso assoluto della directory.
+
+### 5. Installa
+
+```bash
+node installer/dist/install.js --workspace /percorso/assoluto/al/workspace
+```
+
+L'installer rileva automaticamente il Python corretto e scrive la configurazione in `.claude/settings.json`.
+
+### 6. Riavvia Claude Code
+
+Da questo momento, ogni prompt includerà automaticamente le pagine wiki rilevanti.
+
+---
+
+## Cosa puoi fare dalla chat
+
+Una volta installato, puoi parlare con Claude come al solito. In più:
+
+| Dici a Claude... | Claude fa... |
+|-----------------|--------------|
+| "Ricorda che in questo progetto usiamo X" | Scrive una pagina wiki con quella conoscenza |
+| "Cosa sai su Y?" | Cerca nel wiki e risponde con le pagine trovate |
+| "Apri la dashboard del wiki" | Avvia `http://localhost:7331` con il grafo delle pagine |
+| "Fai manutenzione al wiki" | Trova e ripara vettori stale, duplicati, link rotti |
+
+---
+
+## Dashboard
+
+```bash
+# oppure chiedi direttamente a Claude: "apri la dashboard"
+wiki.py serve --workspace /percorso/al/workspace
+```
+
+Apri `http://localhost:7331` — grafo interattivo delle pagine, statistiche di copertura, pagine più usate.
+
+---
+
+## Opzioni installer
+
+```
+--workspace <path>   Percorso assoluto al workspace (obbligatorio)
+--k <n>              Pagine da iniettare per prompt (default: 3)
+--python <exe>       Eseguibile Python (auto-rilevato se omesso)
+--global             Installa in ~/.claude/settings.json
+--dry-run            Mostra la configurazione senza scrivere
+--uninstall          Rimuove hook e MCP server
 ```
 
 ---
 
-## License
+## Come funziona (per chi vuole sapere)
+
+L'installazione aggiunge due cose a `.claude/settings.json`:
+
+**Hook automatico** — prima di ogni tuo prompt, viene eseguito `wiki_context.py` che cerca le 3 pagine semanticamente più vicine nel tuo wiki (LanceDB + embeddings bge-m3) e le prepende come `<wiki-context>`.
+
+**MCP server** — quattro tool (`wiki_query`, `wiki_ingest`, `wiki_lint`, `wiki_serve`) che Claude può chiamare esplicitamente per operazioni attive sul wiki.
+
+I due canali sono indipendenti: se uno smette di funzionare, l'altro continua.
+
+---
+
+## Vuoi usarlo con OpenClaw?
+
+Questo repo è l'integrazione per Claude Code CLI. Se usi OpenClaw (Telegram, Discord, web), vedi [`ai-longterm-wiki-memory-OpenClaw`](https://github.com/giovannifrontera/ai-longterm-wiki-memory-OpenClaw) — stesso sistema, adattatore diverso.
+
+---
+
+## Licenza
 
 AGPL-3.0
 
----
-
 <div align="center">
 
-Works with [Claude Code](https://claude.ai/code) · Embeddings by [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3) · Vector store by [LanceDB](https://lancedb.github.io/lancedb/) · Backend: [ai-longterm-wiki-memory-OpenClaw](https://github.com/giovannifrontera/ai-longterm-wiki-memory-OpenClaw)
+Embeddings: [BAAI/bge-m3](https://huggingface.co/BAAI/bge-m3) · Vector store: [LanceDB](https://lancedb.github.io/lancedb/)
 
 </div>
