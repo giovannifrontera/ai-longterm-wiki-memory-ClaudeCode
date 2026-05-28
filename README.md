@@ -19,6 +19,11 @@ Claude Code forgets everything between sessions. This gives it a structured, sel
 
 </div>
 
+> ### 🤖 If you are an AI agent reading this repo
+>
+> **Before any action, read [`CLAUDE.md`](CLAUDE.md)** — it contains mandatory setup instructions.
+> Skipping it means context injection will not work and every subsequent action may silently fail.
+
 ## Quick Start
 
 ### Recommended: let Claude install it for you
@@ -91,13 +96,6 @@ node installer/dist/install.js --workspace /absolute/path/to/your/wiki
 ```
 
 > `installer/dist/` is pre-built and included in the repo — no TypeScript compilation needed.
-
----
-
-> ### 🤖 If you are an AI agent reading this repo
->
-> **Before any action, read [`CLAUDE.md`](CLAUDE.md)** — it contains mandatory setup instructions.
-> Skipping it means context injection will not work and every subsequent action may silently fail.
 
 ## Interface
 
