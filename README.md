@@ -13,11 +13,86 @@ Claude Code forgets everything between sessions. This gives it a structured, sel
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/works%20with-Claude%20Code-orange)](https://claude.ai/code)
 
-[Quick Start](#quick-start) · [Features](#features) · [Architecture](#architecture) · [PDF Ingestion](#multi-source-pdf-ingestion) · [Web Interface](#web-interface) · [Dashboard](#dashboard-observability) · [MCP Tools](#mcp-tools) · [CLI Reference](#cli-reference)
+[Quick Start](#quick-start) · [Features](#features) · [Architecture](#architecture) · [PDF Ingestion](#multi-source-pdf-ingestion) · [Web Interface](#web-interface) · [Dashboard](#dashboard-observability) · [MCP Tools](#mcp-tools) · [CLI Reference](#cli-reference) · [Changelog](#changelog)
 
 ---
 
 </div>
+
+## Quick Start
+
+### Recommended: let Claude install it for you
+
+The easiest way to install is to let Claude Code handle the setup automatically.
+
+1. Clone this repo:
+   ```bash
+   git clone https://github.com/giovannifrontera/ai-longterm-wiki-memory-ClaudeCode
+   ```
+2. Open Claude Code in the cloned directory
+3. Say: **"install the wiki system"**
+
+Claude reads `CLAUDE.md` and walks you through the entire setup — checks prerequisites, asks where to store your wiki, configures everything, and activates the integration. No manual steps needed.
+
+---
+
+### Manual install (if you prefer)
+
+#### Requirements
+
+- Python 3.10+ — ~2 GB disk for BAAI/bge-m3 (downloaded on first run)
+- Node.js 20+
+- Claude Code CLI
+- lancedb: `pip install lancedb sentence-transformers`
+
+#### Steps
+
+```bash
+# 1. Clone
+git clone https://github.com/giovannifrontera/ai-longterm-wiki-memory-ClaudeCode
+cd ai-longterm-wiki-memory-ClaudeCode
+
+# 2. Python dependencies
+pip install -r requirements.txt
+
+# 3. Configure — choose a directory for your wiki knowledge
+#    Option A: use this repo directory
+cp wiki.config.json.example wiki.config.json
+#    Option B: use a separate directory
+cp wiki.config.json.example /path/to/your/wiki/wiki.config.json
+```
+
+Edit `wiki.config.json` and set `"workspace"` to the absolute path of your chosen directory:
+
+```json
+{
+  "workspace": "/absolute/path/to/your/wiki",
+  "projects": {
+    "research": {
+      "path": "wiki-works/research",
+      "keywords": ["paper", "study", "article", "review"]
+    }
+  },
+  "lancedb": {
+    "path": "memory/lancedb",
+    "embedding_model": "BAAI/bge-m3"
+  }
+}
+```
+
+```bash
+# 4. Initialize the vector index
+python scripts/wiki.py rebuild --workspace /absolute/path/to/your/wiki
+
+# 5. Install hook + MCP server into Claude Code
+node installer/dist/install.js --workspace /absolute/path/to/your/wiki
+
+# 6. Restart Claude Code
+```
+
+> `installer/dist/` is pre-built and included in the repo — no TypeScript compilation needed.
+
+---
 
 > ### 🤖 If you are an AI agent reading this repo
 >
@@ -300,81 +375,6 @@ A `[Stats]` tab built into the web server shows the health of the wiki at a glan
 }
 ```
 
----
-
-## Quick Start
-
-### Recommended: let Claude install it for you
-
-The easiest way to install is to let Claude Code handle the setup automatically.
-
-1. Clone this repo and open it in Claude Code:
-   ```bash
-   git clone https://github.com/giovannifrontera/ai-longterm-wiki-memory-ClaudeCode
-   ```
-2. Open Claude Code in the cloned directory
-3. Say: **"install the wiki system"**
-
-Claude reads `CLAUDE.md` and walks you through the entire setup — checks prerequisites, asks where to store your wiki, configures everything, and activates the integration. No manual steps needed.
-
----
-
-### Manual install (if you prefer)
-
-#### Requirements
-
-- Python 3.10+ — ~2 GB disk for BAAI/bge-m3 (downloaded on first run)
-- Node.js 20+
-- Claude Code CLI
-- lancedb: `pip install lancedb sentence-transformers`
-
-#### Steps
-
-```bash
-# 1. Clone
-git clone https://github.com/giovannifrontera/ai-longterm-wiki-memory-ClaudeCode
-cd ai-longterm-wiki-memory-ClaudeCode
-
-# 2. Python dependencies
-pip install -r requirements.txt
-
-# 3. Configure — choose a directory for your wiki knowledge
-#    Option A: use this repo directory
-cp wiki.config.json.example wiki.config.json
-#    Option B: use a separate directory
-cp wiki.config.json.example /path/to/your/wiki/wiki.config.json
-```
-
-Edit `wiki.config.json` and set `"workspace"` to the absolute path of your chosen directory. Minimal config:
-
-```json
-{
-  "workspace": "/absolute/path/to/your/wiki",
-  "projects": {
-    "research": {
-      "path": "wiki-works/research",
-      "keywords": ["paper", "study", "article", "review"]
-    }
-  },
-  "lancedb": {
-    "path": "memory/lancedb",
-    "embedding_model": "BAAI/bge-m3"
-  }
-}
-```
-
-```bash
-# 4. Initialize the vector index
-python scripts/wiki.py rebuild --workspace /absolute/path/to/your/wiki
-
-# 5. Install hook + MCP server into Claude Code
-node installer/dist/install.js --workspace /absolute/path/to/your/wiki
-
-# 6. Restart Claude Code
-```
-
-> **Note:** `installer/dist/` is pre-built and included in the repo — no TypeScript compilation needed.
-
 ### Dependencies
 
 | Package | Purpose |
@@ -531,6 +531,21 @@ Every command outputs JSON to stdout.
 ## Looking for the OpenClaw integration?
 
 This repo is for Claude Code CLI. If you use [OpenClaw](https://github.com/openclaw/openclaw) (Telegram, Discord, web), see [`ai-longterm-wiki-memory-OpenClaw`](https://github.com/giovannifrontera/ai-longterm-wiki-memory-OpenClaw) — same system, different adapter.
+
+---
+
+## Changelog
+
+### v0.1.0 — 2026-05-28
+
+Initial release — Claude Code native integration via TypeScript MCP server + `UserPromptSubmit` hook.
+
+- **MCP server** — 4 tools: `wiki_query`, `wiki_ingest`, `wiki_lint`, `wiki_serve`
+- **Installer CLI** — auto-detects Python+lancedb, writes hook and `mcpServers` into `.claude/settings.json`
+- **Two independent channels** — hook for automatic context injection, MCP for active wiki operations
+- **CLAUDE.md** — agent-driven installation: Claude handles the entire setup when asked
+- **Pre-built dist/** — no TypeScript compilation required by the end user
+- Python backend and web frontend from [ai-longterm-wiki-memory-OpenClaw](https://github.com/giovannifrontera/ai-longterm-wiki-memory-OpenClaw) v3.1.2
 
 ---
 
