@@ -51,3 +51,25 @@ describe("handleWikiIngest", () => {
     expect(result.content[0].text).toContain("ok");
   });
 });
+
+import { wikiLintTool, handleWikiLint } from "../src/tools/wiki_lint.js";
+
+describe("wikiLintTool definition", () => {
+  it("ha name corretto", () => expect(wikiLintTool.name).toBe("wiki_lint"));
+  it("richiede solo workspace", () => {
+    const required = wikiLintTool.inputSchema.required as string[];
+    expect(required).toContain("workspace");
+  });
+});
+
+describe("handleWikiLint", () => {
+  it("ritorna output lint", async () => {
+    const fakeRun = async () => "LINT OK: 0 issues";
+    const result = await handleWikiLint(
+      { workspace: "/wiki", scriptsDir: "/repo/scripts", python: "py" },
+      { workspace: "/wiki" },
+      fakeRun
+    );
+    expect(result.content[0].text).toBe("LINT OK: 0 issues");
+  });
+});
