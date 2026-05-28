@@ -1,0 +1,9 @@
+node_modules/
+dist/
+mcp-server/dist/
+installer/dist/
+__pycache__/
+*.pyc
+memory/lancedb/
+.wiki-plugin-debug.log
+.wiki-query-log.jsonl
