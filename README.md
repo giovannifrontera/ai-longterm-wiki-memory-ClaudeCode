@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
 # 🧬 ai-longterm-wiki-memory-ClaudeCode
 
@@ -194,11 +194,12 @@ Open a new Claude Code session in any project. The SessionStart hook will automa
 
 This project is part of a coherent research toolchain for AI-augmented academic knowledge management:
 
-| Project | Role |
-|---|---|
-| [ai-wiki-graph-RAG-lms](https://github.com/giovannifrontera/ai-wiki-graph-RAG-lms) | LTI 1.3 backend — transforms course materials into a navigable wiki with RAG and knowledge graph |
-| **ai-longterm-wiki-memory-ClaudeCode** ← *you are here* | Persistent semantic memory — the memory engine that powers long-horizon AI research |
-| [academic-PRISMA-research-workflow](https://github.com/giovannifrontera/academic-PRISMA-research-workflow) | Systematic review automation — feeds evidence-based content into the wiki ecosystem |
+| Project | LLM | Role |
+|---|---|---|
+| [ai-wiki-graph-RAG-lms](https://github.com/giovannifrontera/ai-wiki-graph-RAG-lms) | Anthropic / OpenAI | LTI 1.3 backend for Moodle, Canvas, Blackboard, Sakai, Open edX |
+| **ai-longterm-wiki-memory-ClaudeCode** ← *you are here* | Claude | Native Claude Code integration — MCP + hooks |
+| [ai-longterm-wiki-memory-OpenClaw](https://github.com/giovannifrontera/ai-longterm-wiki-memory-OpenClaw) | Any (LLM-agnostic) | OpenClaw plugin — works with any model via Telegram, Discord, web |
+| [academic-PRISMA-research-workflow](https://github.com/giovannifrontera/academic-PRISMA-research-workflow) | Claude | Systematic review automation — feeds evidence-based content into the wiki |
 
 ---
 
