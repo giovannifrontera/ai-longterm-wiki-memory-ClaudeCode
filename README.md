@@ -7,7 +7,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude_Code-compatible-cc785c?style=flat-square&logo=anthropic&logoColor=white)](https://claude.ai/code)
 [![LanceDB](https://img.shields.io/badge/LanceDB-embedded-e05d2a?style=flat-square)](https://lancedb.com)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776ab?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square)](LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/giovannifrontera/ai-longterm-wiki-memory-ClaudeCode?style=flat-square)](https://github.com/giovannifrontera/ai-longterm-wiki-memory-ClaudeCode/commits)
 
 [Problem](#-the-problem) · [Theory](#-theoretical-framework) · [Architecture](#-three-layer-architecture) · [Tech](#-technical-deep-dive) · [Quick Start](#-quick-start) · [Ecosystem](#-ai-wiki-ecosystem)
@@ -200,6 +200,12 @@ This project is part of a coherent research toolchain for AI-augmented academic 
 | **ai-longterm-wiki-memory-ClaudeCode** ← *you are here* | Claude | Native Claude Code integration — MCP + hooks |
 | [ai-longterm-wiki-memory-OpenClaw](https://github.com/giovannifrontera/ai-longterm-wiki-memory-OpenClaw) | Any (LLM-agnostic) | OpenClaw plugin — works with any model via Telegram, Discord, web |
 | [academic-PRISMA-research-workflow](https://github.com/giovannifrontera/academic-PRISMA-research-workflow) | Claude | Systematic review automation — feeds evidence-based content into the wiki |
+
+---
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0. See [LICENSE](LICENSE).
 
 ---
 
